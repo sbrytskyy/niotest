@@ -3,16 +3,16 @@ package com.m32s.java.test;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+//import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
-public class ServerDataWorker extends Thread {
+public class ServerDataWorker /*extends Thread*/ {
 
 	private static Logger logger = Logger.getLogger(ServerDataWorker.class);
 
-	private final ExecutorService execService = Executors.newFixedThreadPool(32);
-	private LinkedBlockingQueue<ServerDataEvent> eventsQueue = new LinkedBlockingQueue<ServerDataEvent>();
+	private final ExecutorService execService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//	private LinkedBlockingQueue<ServerDataEvent> eventsQueue = new LinkedBlockingQueue<ServerDataEvent>();
 
 	class ServerDataEvent {
 
@@ -48,10 +48,13 @@ public class ServerDataWorker extends Thread {
 		byte[] dataCopy = new byte[count];
 		System.arraycopy(data, 0, dataCopy, 0, count);
 
-		eventsQueue.add(new ServerDataEvent(server, socket, dataCopy));
+		ServerDataEvent dataEvent = new ServerDataEvent(server, socket, dataCopy);
+//		eventsQueue.add(serverDataEvent);
+		SmppProcessor sp = new SmppProcessor(dataEvent.getSocket(), dataEvent.getServer(), dataEvent.getDataCopy());
+		execService.execute(sp);
 	}
 
-	public void run() {
+/*	public void run() {
 		ServerDataEvent dataEvent;
 
 		while (true) {
@@ -65,6 +68,7 @@ public class ServerDataWorker extends Thread {
 			}
 		}
 	}
+*/
 
 	public void invalidateSocket(SocketChannel socket) {
 		SmppProcessor.invalidateSocket(socket);

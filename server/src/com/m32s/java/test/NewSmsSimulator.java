@@ -9,9 +9,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -54,7 +52,7 @@ public class NewSmsSimulator extends Thread implements IServer {
 	}
 
 	public void init() throws IOException {
-		worker.start();
+//		worker.start();
 
 		selector = Selector.open();
 		
@@ -190,8 +188,6 @@ public class NewSmsSimulator extends Thread implements IServer {
 		// Indicate we want the interest ops set changed
 		changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
 
-		// TODO reconsider why List ?
-		
 		// And queue the data we want written
 		CopyOnWriteArrayList<ByteBuffer> queue = pendingData.get(socket);
 		if (queue == null) {
@@ -199,6 +195,7 @@ public class NewSmsSimulator extends Thread implements IServer {
 			pendingData.put(socket, queue);
 		}
 		queue.add(ByteBuffer.wrap(data));
+		logger.debug("[TO SEND] socket: " + socket + ", queue size: " + queue.size());
 
 		// Finally, wake up our selecting thread so it can make the required
 		// changes
@@ -206,6 +203,8 @@ public class NewSmsSimulator extends Thread implements IServer {
 	}
 	
 	public static void main(String[] args) {
+		logger.info("Starting SMSC simulator. Cores count: " + Runtime.getRuntime().availableProcessors());
+		
 		NewSmsSimulator smsSimulator = NewSmsSimulator.getInstance();
 		smsSimulator.start();
 
