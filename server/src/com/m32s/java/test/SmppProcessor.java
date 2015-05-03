@@ -131,6 +131,9 @@ public class SmppProcessor implements Runnable {
             if (l % 500 == 0) {
             	logger.info("l=" + l + ". Message processed...");
             }
+            
+            // TODO emulate processor activity
+            //StringEncrypter.test();
 			break;
 		}
 	}

@@ -44,3 +44,6 @@ Temporary Items
 /client/bin
 /server/bin
 /server/3rdparty
+/server/nbproject/private/
+/server/build/
+/server/dist/
